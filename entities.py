@@ -35,16 +35,48 @@ class Elevator(ElevatorSprite):
     === Attributes ===
     passengers: A list of the people currently on this elevator
     floor: The number of the floor the elevator is currently on
+    max_capacity: The maximum number of people who can fit in an elevator.
 
     === Representation invariants ===
-    1 <= floor <= #TODO(WHATEVER THE MAX NUMBER OF FLOORS IS - FIGURE OUT HOW TO HANDLE THIS)
+    1 <= floor <= max floors#TODO(WHATEVER THE MAX NUMBER OF FLOORS IS - FIGURE OUT HOW TO HANDLE THIS)
+    max_capacity > 0
+    len(passengers) <= max_capacity
     """
     passengers: List[Person]
     floor: int
+    max_capacity: int
 
-    #TODO init w/ 0 passengers (no params)
+    def __init__(self, max_capacity: int) -> None:
+        """Creates a new Elevator
+
+        Precondition:
+        -max_capacity > 0
+        """
+        self.passengers = []
+        self.floor = 1
+        self.max_capacity = max_capacity
+        ElevatorSprite.__init__(self)
+
+    def fullness(self) -> float:
+        """Return the fraction that this elevator is filled.
+
+        The value returned should be a float between 0.0 (completely empty) and
+        1.0 (completely full).
+        """
+        return float(len(self.passengers)/self.max_capacity)
 
     # Elevators can only move up and down 1 floor per round
+
+    def move(self, direction: int) -> None:
+        """Moves the elevator by the amount specified in <direction>
+
+        Preconditions:
+        - -1 <= direction <= 1
+        - if floor == max_floor: direction != 1.
+        - if floor == 1: direction != -1
+        """
+
+        self.floor += direction
 
 
 class Person(PersonSprite):
@@ -64,26 +96,25 @@ class Person(PersonSprite):
     target: int
     wait_time: int
 
-    def __init__(self, start: int, target: int):
-        """Makes a new person and using there <start> floor and there <target> floor.
+    def __init__(self, start: int, target: int) -> None:
+        """Makes a new person and using there <start> floor
+         and there <target> floor.
 
         Pre-conditions:
         - start >= 1
         - target >= 1
         """
-
-        PersonSprite.__init__(self)
         self.start = start
         self.target = target
         self.wait_time = 0
 
+        PersonSprite.__init__(self)
 
-    def round_passed (self):
+    def round_passed(self) -> None:
         """called every time a game round passes so that the person
         can update its internal state."""
 
         self.wait_time += 1
-        # TODO Change rounds call this on every person this should be called somewere in the forloop of the run method or simulation. Maybe another private helper.
 
     def get_anger_level(self) -> int:
         """Return this person's anger level.
