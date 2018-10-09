@@ -100,7 +100,7 @@ class RandomArrivals(ArrivalGenerator):
         """
         ArrivalGenerator.__init__(self, max_floor, num_people)
 
-    def generate(self, round_num: int) -> Dict[int, List[Person]]:
+    def generate(self, round_num: int) -> Dict[int, List[Person]]:  #TODO: look into using sample for this
         """Return the new arrivals for the simulation at the given round.
 
         The returned dictionary maps floor number to the people who
@@ -111,13 +111,18 @@ class RandomArrivals(ArrivalGenerator):
         by_floor = dict()
 
         for _ in range(self.num_people):
-            start_floor = random.randint(0, self.max_floor)
-            target_floor = random.randint(0, self.max_floor)
+            start_floor = random.randint(1, self.max_floor)
+
+            same_floor = True
+            while same_floor:
+                target_floor = random.randint(0, self.max_floor)
+                if not start_floor == target_floor:
+                    same_floor = False
+
             by_floor.setdefault(start_floor, []) # this makes the floor if the floor has not yet been made
             by_floor[start_floor].append(Person(start_floor, target_floor))
 
-        #TODO - DECIDE IF THIS SHOULD HAVE FLOORS THAT ARE NOT HAVING ANYONE ARRIVE ON IT
-
+        return by_floor
 
 class FileArrivals(ArrivalGenerator):
     """Generate arrivals from a CSV file.
@@ -147,7 +152,7 @@ class FileArrivals(ArrivalGenerator):
 
         Precondition:
             <filename> refers to a valid CSV file, following the specified
-            format and restrictions from the assignment handout.
+            format and restrictions from the assignment handout. # TODO: add example to doc string
         """
         ArrivalGenerator.__init__(self, max_floor, None)
         self.arrivals = dict()
@@ -170,7 +175,6 @@ class FileArrivals(ArrivalGenerator):
                     else:
                         person = Person(temp, data[i])
                         self.arrivals[round].append(person)
-        #TODO - DECIDE IF WE'LL INCLUDE ALL ROUNDS (EVEN WHEN NO ONE COMES), BUT WE DON'T HAVE NUM ROUNDS IN THIS CLASS...
 
 
     def generate(self, round_num: int) -> Dict[int, List[Person]]:
@@ -182,7 +186,7 @@ class FileArrivals(ArrivalGenerator):
         You can choose whether to include floors where no people arrived.
         """
 
-        #TODO - DECIDE IF WILL INCLUDE FLOORS WHERE NO PERSON ARRIVED (NOT CURRENTLY THE CASE)
+        #TODO - DECIDE IF WILL INCLUDE FLOORS WHERE NO PERSON ARRIVED (NOT CURRENTLY THE CASE) (Lev Dont need to include empty floors)
 
         round_data = self.arrivals[round_num]
         by_floor = dict()
@@ -230,11 +234,41 @@ class MovingAlgorithm:
         raise NotImplementedError
 
 
-
 class RandomAlgorithm(MovingAlgorithm):
     """A moving algorithm that picks a random direction for each elevator. 
     """#could be to sit still
-    pass #TODO implement this
+
+    def move_elevators(self,
+                       elevators: List[Elevator],
+                       waiting: Dict[int, List[Person]],
+                       max_floor: int) -> List[Direction]:
+        """Return a list of directions for each elevator to move to.
+
+        As input, this method receives the list of elevators in the simulation,
+        a dictionary mapping floor number to a list of people waiting on
+        that floor, and the maximum floor number in the simulation.
+
+        Note that each returned direction should be valid:
+            - An elevator at Floor 1 cannot move down.
+            - An elevator at the top floor cannot move up.
+        """
+
+        directions = []
+        for elevator in elevators:
+            # Direction(int) creates a direction of type Direction.UP, Down, or
+            # Stay.
+            if elevator.floor >= max_floor:
+                directions.append(Direction(random.randint(-1, 0)))
+            elif elevator.floor <= 1:
+                directions.append(Direction(random.randint(0, 1)))
+            else:
+                directions.append(Direction(random.randint(-1, 1)))
+
+        return directions
+
+
+
+
 
 
 class PushyPassenger(MovingAlgorithm):
