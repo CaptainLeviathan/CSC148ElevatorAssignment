@@ -29,7 +29,7 @@ from visualizer import Visualizer
 ################################################################################
 
 
-def _dequeu(lst: Any) -> Any:
+def _dequeue(lst: Any) -> Any:
     """Removes and returns the first item in a list
     """
     item = lst[0]
@@ -40,6 +40,9 @@ def _dequeu(lst: Any) -> Any:
 def _elevator_has_room(elevator: Elevator) -> bool:
     """Returns true if the elevator can take more people.
     """
+    #Dak - we could also use this:
+    #return not elevator._fullness == 1.0
+    #thus, if it is full (1.0), then the elevator has no room (returns false)
     return len(elevator.passengers) < elevator.max_capacity
 
 
@@ -199,7 +202,7 @@ class Simulation:
         for elevator in self.elevators:
             floor = elevator.floor
             while _elevator_has_room(elevator) and len(self.waiting[floor]) > 0:
-                boarder = _dequeu(self.waiting[floor])
+                boarder = _dequeue(self.waiting[floor])
                 elevator.passengers.append(boarder)
                 self.visualizer.show_boarding(boarder, elevator)
 

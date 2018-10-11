@@ -280,7 +280,39 @@ class PushyPassenger(MovingAlgorithm):
     If the elevator isn't empty, it moves towards the target floor of the
     *first* passenger who boarded the elevator.
     """
-    pass #TODO implement this
+
+    def move_elevators(self,
+                       elevators: List[Elevator],
+                       waiting: Dict[int, List[Person]],
+                       max_floor: int) -> List[Direction]:
+        """Return a list of directions for each elevator to move to.
+
+        As input, this method receives the list of elevators in the simulation,
+        a dictionary mapping floor number to a list of people waiting on
+        that floor, and the maximum floor number in the simulation.
+
+        Note that each returned direction should be valid:
+            - An elevator at Floor 1 cannot move down.
+            - An elevator at the top floor cannot move up.
+        """
+        #TODO (dak) make sure the passenger target can never be equal to the elevator floor. If it can be, add another component to if statement
+        directions = []
+
+        for elevator in elevators:
+
+            if elevator.passengers == []:
+                if elevator.floor > 1:
+                    directions.append(-1)
+                else:
+                    directions.append(0)
+            else:
+                passenger = elevator.passengers[0]
+                if passenger.target > elevator.floor:
+                    directions.append(1)
+                else: #passenger.target < elevator.floor
+                    directions.append(-1)
+
+        return directions
 
 
 class ShortSighted(MovingAlgorithm):

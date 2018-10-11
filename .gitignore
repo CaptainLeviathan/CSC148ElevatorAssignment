@@ -111,4 +111,7 @@ venv.bak/
 dmypy.json
 
 #python ta
-.html
+*.html
+
+# windows stuff
+*.xml
