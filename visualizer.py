@@ -153,7 +153,7 @@ class Visualizer:
             return
 
         from_x = person.rect.centerx
-        target_x = 10
+        target_x = WIDTH - 10
 
         elevator.update()
 

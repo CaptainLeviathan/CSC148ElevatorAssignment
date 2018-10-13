@@ -115,7 +115,7 @@ class RandomArrivals(ArrivalGenerator):
 
             same_floor = True
             while same_floor:
-                target_floor = random.randint(0, self.max_floor)
+                target_floor = random.randint(1, self.max_floor)
                 if not start_floor == target_floor:
                     same_floor = False
 
@@ -168,7 +168,7 @@ class FileArrivals(ArrivalGenerator):
                 # and store them.
                 round = line[0]
                 self.arrivals[round] = []
-                data = line[4:].split(', ')
+                data = line[4:].split(', ')#TODO this line has error list has no attribut slpit
                 for i in range(len(data)):
                     if (i == 0 or i % 2 == 0):
                         temp = data[i]
@@ -304,5 +304,6 @@ if __name__ == '__main__':
         'allowed-io': ['__init__'],
         'extra-imports': ['entities', 'random', 'csv', 'enum'],
         'max-nested-blocks': 4,
-        'disable': ['R0201']
+        'disable': ['R0201'],
+        'max-attributes': 12,
     })
