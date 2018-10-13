@@ -113,5 +113,7 @@ dmypy.json
 #python ta
 *.html
 
-# windows stuff
+#Widows struff
+codestyles
+_windows
 *.xml

@@ -79,7 +79,6 @@ class Simulation:
     #   arrived during the simulation.
     # _completed_people_times: A list of times for the
     #   people who completed their journey.
-    # _number_of_iterations: The number of rounds in the simulation.
 
     arrival_generator: algorithms.ArrivalGenerator
     elevators: List[Elevator]
@@ -90,7 +89,6 @@ class Simulation:
 
     _total_people: int
     _completed_people_times: List[int]
-    _number_of_iterations: int
 
     def __init__(self,
                  config: Dict[str, Any]) -> None:
@@ -120,7 +118,6 @@ class Simulation:
 
         self._total_people = 0
         self._completed_people_times = []
-        self._number_of_iterations = 0
 
     ############################################################################
     # Handle rounds of simulation.
@@ -136,15 +133,14 @@ class Simulation:
         Note: each run of the simulation starts from the same initial state
         (no people, all elevators are empty and start at floor 1).
         """
-        self._number_of_iterations = num_rounds
         for i in range(num_rounds):
             self.visualizer.render_header(i)
 
+            # Stage 0: update people state (Lev added this on) this makes the assumption that peoples first round of existence is round 0.
+            self._update_people() #TODO find out if this should come befor or after new arivals
+
             # Stage 1: generate new arrivals
             self._generate_arrivals(i)
-
-            #Stage 1.5: update people state (Lev added this on)
-            self._update_people() #TODO find out if this should come befor or after new arivals
 
             # Stage 2: leave elevators
             self._handle_leaving()
@@ -158,7 +154,7 @@ class Simulation:
             # Pause for 1 second
             self.visualizer.wait(1)
 
-        return self._calculate_stats()
+        return self._calculate_stats(num_rounds)
 
     def _generate_arrivals(self, round_num: int) -> None:
         """Generate and visualize new arrivals."""
@@ -192,6 +188,7 @@ class Simulation:
             for passenger in passengers:
                 if passenger.target == floor:
                     passengers.remove(passenger)
+                    # This is for logging
                     self._completed_people_times.append(passenger.wait_time)
                     self.visualizer.show_disembarking(passenger, elevator)
 
@@ -222,16 +219,27 @@ class Simulation:
     ############################################################################
     # Statistics calculations
     ############################################################################
-    def _calculate_stats(self) -> Dict[str, int]:
+    def _calculate_stats(self, number_of_rounds: int) -> Dict[str, int]:
         """Report the statistics for the current run of this simulation.
         """
+        comp_times = self._completed_people_times
+
+        if not comp_times:
+            min_time = -1
+            max_time = -1
+            avg_time = -1
+        else:
+            min_time = min(comp_times)
+            max_time = max(comp_times)
+            avg_time = _average(comp_times)
+
         return {
-            'num_iterations': self._number_of_iterations,
+            'num_iterations': number_of_rounds,
             'total_people': self._total_people,
             'people_completed': len(self._completed_people_times),
-            'max_time': max(self._completed_people_times),
-            'min_time': min(self._completed_people_times),
-            'avg_time': _average(self._completed_people_times)
+            'max_time': max_time,
+            'min_time': min_time,
+            'avg_time': avg_time
         }
 
 
@@ -261,5 +269,7 @@ if __name__ == '__main__':
     import python_ta
     python_ta.check_all(config={
         'extra-imports': ['entities', 'visualizer', 'algorithms', 'time'],
-        'max-nested-blocks': 4
+        'max-nested-blocks': 4,
+        'max-attributes': 12,
+        'disable': ['R0201']
     })

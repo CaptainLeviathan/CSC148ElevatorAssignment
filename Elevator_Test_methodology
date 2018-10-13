@@ -1,0 +1,21 @@
+Already coverd testing
+test_random_arrival_generator_zero
+    *Check the the floor is in the correct range.
+    *Check that the right number of people were generated.
+      -i.e. the number per_round.
+    *Checks that people are being sent to the right floors
+      -i.e. those floors exist
+test_file_arrival_generator
+    *Test to see that round 0 has no arivals
+    *Test to see that round one has correct arivals
+    *Test to see that round 5 and only one person arives on fith floor
+
+test_random_moving_algorithm
+    This one is a bit more wishy washy.
+    * tests that numrounds and total people comes back ok.
+    * Checks that the range of people completed is good.
+    * Check that if no one finished that aveage time,min time and max time are all -1
+    * Checks that all the reporting makes some sense
+
+TODO add these for pushy passenger and short sighted.
+TODO use manual test to make more general test of the algorithems.
