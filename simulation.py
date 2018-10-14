@@ -30,7 +30,7 @@ from visualizer import Visualizer
 
 
 def _dequeu(lst: list) -> Any:
-    """Removes and returns the first item in a list
+    """Removes and returns the first item in a list.
     """
     item = lst[0]
     lst.remove(item)
@@ -69,8 +69,10 @@ class Simulation:
     visualizer: the Pygame visualizer used to visualize this simulation
     waiting: a dictionary of people waiting for an elevator
              (keys are floor numbers, values are the list of waiting people)
+    === Representation Invariants ===
+    - elevators > 0
+    - num_floors > 0
     """
-    # TODO Add representaion invariants
 
     # === Private Attributes ===
     # _total_people: The total number of people who have
@@ -91,10 +93,6 @@ class Simulation:
     def __init__(self,
                  config: Dict[str, Any]) -> None:
         """Initialize a new simulation using the given configuration."""
-
-        # Initialize the visualizer.
-        # Note that this should be called *after* the other attributes
-        # have been initialized.
 
         self.arrival_generator = config['arrival_generator']
 
@@ -165,8 +163,20 @@ class Simulation:
 
         self.visualizer.show_arrivals(arrivals)
 
+    def _handle_leaving(self) -> None:
+        """Handle people leaving elevators."""
+        for elevator in self.elevators:
+            floor = elevator.floor
+            passengers = elevator.passengers
+            for passenger in passengers:
+                if passenger.target == floor:
+                    passengers.remove(passenger)
+                    self.visualizer.show_disembarking(passenger, elevator)
+                    # This is for stats
+                    self._completed_people_times.append(passenger.wait_time)
+
     def _update_people(self) -> None:
-        """lets people know round has passed"""
+        """Calls round_passed on all people in the simulation."""
 
         # Updates all the people waiting
         for floor in self.waiting:
@@ -177,18 +187,6 @@ class Simulation:
         for elevator in self.elevators:
             for person in elevator.passengers:
                 person.round_passed()
-
-    def _handle_leaving(self) -> None:
-        """Handle people leaving elevators."""
-        for elevator in self.elevators:
-            floor = elevator.floor
-            passengers = elevator.passengers
-            for passenger in passengers:
-                if passenger.target == floor:
-                    passengers.remove(passenger)
-                    # This is for logging
-                    self._completed_people_times.append(passenger.wait_time)
-                    self.visualizer.show_disembarking(passenger, elevator)
 
     def _handle_boarding(self) -> None:
         """Handle boarding of people and visualize."""
@@ -219,7 +217,8 @@ class Simulation:
     ############################################################################
     def _calculate_stats(self, number_of_rounds: int) -> Dict[str, int]:
         """Report the statistics for the current run of this simulation.
-        """
+        Uses <number_of_rounds> for this reporting.
+         """
         comp_times = self._completed_people_times
 
         if not comp_times:

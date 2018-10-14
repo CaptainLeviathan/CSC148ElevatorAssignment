@@ -140,7 +140,7 @@ class FileArrivals(ArrivalGenerator):
     max_floor >= 2
     num_people is None or num_people >= 0
     """
-    max_floor: int
+    max_floor: int #TODO you dont need these type anotations. They only need to be in the super class.
     num_people: Optional[int]
     arrivals: Dict[int, List[Person]]
 
@@ -255,8 +255,8 @@ class RandomAlgorithm(MovingAlgorithm):
 
         directions = []
         for elevator in elevators:
-            # Direction(int) creates a direction of type Direction.UP, Down, or
-            # Stay.
+            # Direction(int) creates a <Direction> of type Direction.UP, Down,
+            # or Stay.
             if elevator.floor >= max_floor:
                 directions.append(Direction(random.randint(-1, 0)))
             elif elevator.floor <= 1:
