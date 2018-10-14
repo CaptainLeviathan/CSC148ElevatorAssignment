@@ -85,10 +85,20 @@ class ManualMovingAlgorithm(MovingAlgorithm):
             - An elevator at Floor 1 cannot move down.
             - An elevator at the top floor cannot move up.
         """
+        print("waiting passengers")
+        waiting_tuples = list(waiting.items())
+        waiting_tuples.sort()
+        waiting_tuples.reverse()
+        for floor, waitters in waiting_tuples:  # this works! OMG!
+            print(f'{floor}: {len(waitters)}')
+
         output = []
         for i in range(len(elevators)):
+            #info for logging
+            print(f'Current floor is {elevators[i].floor}')
             print("Target floors:")
             for pas in elevators[i].passengers: print(pas.target)
+
             str = input(f"Direction for elevator {i}: ")
             str = str.upper()
             if str == 'UP':
@@ -113,7 +123,7 @@ if __name__ == '__main__':
     config = {
         'num_floors': num_floors,
         'num_elevators': num_evevarots,
-        'elevator_capacity': 3,
+        'elevator_capacity': elevator_capasity,
         'num_people_per_round': num_people_per_round,
         'arrival_generator': ManualArrivalGenerator(num_floors,
                                                     num_people_per_round),
@@ -128,6 +138,8 @@ if __name__ == '__main__':
     for line in csv_report:
         if len(line) > 1: # just to remove any rounds were no one arived
             csv_str = csv_str + ", ".join(str(i) for i in line) + "\n"
+    print("=== config ===")
+    print(config)
     print("=== Copy to CSV if you want ===")
     print(csv_str)
     print(stats)

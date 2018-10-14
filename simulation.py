@@ -29,7 +29,7 @@ from visualizer import Visualizer
 ################################################################################
 
 
-def _dequeu(lst: Any) -> Any:
+def _dequeu(lst: list) -> Any:
     """Removes and returns the first item in a list
     """
     item = lst[0]
@@ -38,18 +38,19 @@ def _dequeu(lst: Any) -> Any:
 
 
 def _elevator_has_room(elevator: Elevator) -> bool:
-    """Returns true if the elevator can take more people.
+    """Returns true if the <elevator> can take more people.
     """
     return len(elevator.passengers) < elevator.max_capacity
 
 
 def _average(lst: List[int]) -> Optional[float]:
     """Takes the average of a list of ints
-    if the list is empty it will return None
+    if the list is empty it will return None.
     """
 
     if len(lst) == 0:
         return None
+
     total = 0
     for amount in lst:
         total += amount
@@ -228,7 +229,7 @@ class Simulation:
         else:
             min_time = min(comp_times)
             max_time = max(comp_times)
-            avg_time = _average(comp_times)
+            avg_time = int(_average(comp_times))
 
         return {
             'num_iterations': number_of_rounds,

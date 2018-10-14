@@ -203,7 +203,54 @@ def test_short_sighted_moving_algorithm() -> None:
     assert results['min_time'] == 3
     assert results['avg_time'] == 4
 
+def test_short_sighted_unit_test():
+    config = {
+        'num_floors': 4,
+        'num_elevators': 2,
+        'elevator_capacity': 2,
+        # This is likely not used.
+        'num_people_per_round': 3,
+        'arrival_generator': FileArrivals(5, 'sample_arrivals.csv'),
+        'moving_algorithm': ShortSighted(),
+        'visualize': False
+    }
+
+    sim = Simulation(config)
+    results = sim.run(8)
+
+    test_results = {'num_iterations': 8,
+                    'total_people': 8,
+                    'people_completed': 5,
+                    'max_time': 3,
+                    'min_time': 2,
+                    'avg_time': 2}
+
+    assert test_results == results
+
+def test_pushy_passenger():
+    config = {
+        'num_floors': 3,
+        'num_elevators': 2,
+        'elevator_capacity': 2,
+        # This is likely not used.
+        'num_people_per_round': 3,
+        'arrival_generator': FileArrivals(5, 'sample_arrivals.csv'),
+        'moving_algorithm': ShortSighted(),
+        'visualize': False
+    }
+
+    sim = Simulation(config)
+    results = sim.run(10)
+
+    test_results = {'num_iterations': 10,
+                    'total_people': 13,
+                    'people_completed': 12,
+                    'max_time': 6,
+                    'min_time': 1,
+                    'avg_time': 3}
+
+    assert results == test_results
 
 if __name__ == '__main__':
     import pytest
-    pytest.main(['a1_sample_test.py'])
+    pytest.main(['a1_tests.py'])
