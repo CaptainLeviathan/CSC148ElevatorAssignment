@@ -28,7 +28,7 @@ from visualizer import Visualizer
 # Helpers
 ################################################################################
 
-def _dequeu(lst: list) -> Any:
+def _dequeue(lst: list) -> Any:
     """Removes and returns the first item in a list.
     """
     item = lst[0]
