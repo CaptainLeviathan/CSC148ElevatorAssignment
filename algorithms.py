@@ -295,22 +295,21 @@ class PushyPassenger(MovingAlgorithm):
             - An elevator at Floor 1 cannot move down.
             - An elevator at the top floor cannot move up.
         """
-        #TODO (dak) make sure the passenger target can never be equal to the elevator floor. If it can be, add another component to if statement
         directions = []
 
         for elevator in elevators:
 
             if elevator.passengers == []:
                 if elevator.floor > 1:
-                    directions.append(-1)
+                    directions.append(Direction.DOWN)
                 else:
-                    directions.append(0)
+                    directions.append(Direction.STAY)
             else:
                 passenger = elevator.passengers[0]
                 if passenger.target > elevator.floor:
-                    directions.append(1)
+                    directions.append(Direction.UP)
                 else: #passenger.target < elevator.floor
-                    directions.append(-1)
+                    directions.append(Direction.DOWN)
 
         return directions
 
@@ -326,7 +325,51 @@ class ShortSighted(MovingAlgorithm):
 
     In this case, the order in which people boarded does *not* matter.
     """
-    pass #TODO implement this
+    def move_elevators(self,
+                       elevators: List[Elevator],
+                       waiting: Dict[int, List[Person]],
+                       max_floor: int) -> List[Direction]:
+        """Return a list of directions for each elevator to move to.
+
+        As input, this method receives the list of elevators in the simulation,
+        a dictionary mapping floor number to a list of people waiting on
+        that floor, and the maximum floor number in the simulation.
+
+        Note that each returned direction should be valid:
+            - An elevator at Floor 1 cannot move down.
+            - An elevator at the top floor cannot move up.
+        """
+        directions = []
+
+        for elevator in elevators:
+
+            if len(elevator.passengers) > 0:
+                # Passengers are on the elevator
+                # Go towards the closest target floor of a passenger
+                closest_distance = max_floor + 1
+                elevator_target = max_floor + 1
+
+                for passenger in elevator.passengers:
+                    distance = abs(elevator.floor - passenger.target)
+                    if distance < closest_distance:
+                        closest_distance = distance
+                        elevator_target = passenger.target
+
+                if elevator_target > elevator.floor:
+                    distance.append(Direction.UP)
+                else:
+                    distance.append(Direction.DOWN)
+
+            #elif PEOPLE ARE WAITING FOR AN ELEVATOR
+                # TODO - FIGURE OUT HOW TO KNOW THAT THERE ARE PEOPLE WAITING
+                # This is for when the elevator is empty, but people are waiting for an elevator
+                # It should move to the closest floor where someone is waiting
+
+            else:
+                # No passengers on board, no one waiting for an elevator
+                directions.append(Direction.STAY)
+
+        return directions
 
 
 if __name__ == '__main__':
