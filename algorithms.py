@@ -158,12 +158,28 @@ class FileArrivals(ArrivalGenerator):
                 # to one line of the original file.
                 # You'll need to convert the strings to ints and then process
                 # and store them.
-                round = line.pop(0)
-                self.arrivals[round] = []
+                round_num = int(line.pop(0))
+                self.arrivals[round_num] = []
                 for i in range(len(line)):
-                    if (i == 0 or i % 2 == 0):
+                    if i % 2 == 0: #for every other item in line, beginning at 0
                         person = Person(int(line[i]), int(line[i+1]))
-                        self.arrivals[round].append(person)
+                        self.arrivals[round_num].append(person)
+
+        #TODO DELETE THESE ASSERT STATEMENTS
+        """ FOR SAMPLE_ARRIVALS.CSV TESTING
+        assert len(self.arrivals[1]) == 2
+        assert self.arrivals[1][0].start == 1
+        assert self.arrivals[1][0].target == 4
+        assert self.arrivals[1][1].start == 5
+        assert self.arrivals[1][1].target == 3
+        assert 2 not in self.arrivals
+        assert len(self.arrivals[3]) == 1
+        assert self.arrivals[3][0].start == 1
+        assert self.arrivals[3][0].target == 2
+        assert 4 not in self.arrivals
+        assert len(self.arrivals[5]) == 1
+        assert self.arrivals[5][0].start == 4
+        assert self.arrivals[5][0].target == 2"""
 
 
     def generate(self, round_num: int) -> Dict[int, List[Person]]:
@@ -174,13 +190,23 @@ class FileArrivals(ArrivalGenerator):
 
         You can choose whether to include floors where no people arrived.
         """
+        #TODO DELETE ALL ASSERTS IN THIS METH0OD
         by_floor = dict()
 
         if round_num in self.arrivals:
+            """assert isinstance(self.arrivals[round_num], list)
+            assert self.arrivals[round_num] != []"""
             round_data = self.arrivals[round_num]
             for person in round_data:
                 by_floor.setdefault(person.start, []) # this makes the floor if the floor has not yet been made
                 by_floor[person.start].append(person)
+
+        """if round_num == 1:
+            assert len(by_floor) == 2
+        elif round_num == 3 or round_num == 5:
+            assert len(by_floor) == 1
+        else:
+            assert len(by_floor) == 0"""
 
         return by_floor
 
