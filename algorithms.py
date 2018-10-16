@@ -366,9 +366,9 @@ class ShortSighted(MovingAlgorithm):
                         elevator_target = passenger.target
 
                 if elevator_target > elevator.floor:
-                    distance.append(Direction.UP)
+                    directions.append(Direction.UP)
                 else:
-                    distance.append(Direction.DOWN)
+                    directions.append(Direction.DOWN)
 
             #elif PEOPLE ARE WAITING FOR AN ELEVATOR
                 # TODO - FIGURE OUT HOW TO KNOW THAT THERE ARE PEOPLE WAITING
