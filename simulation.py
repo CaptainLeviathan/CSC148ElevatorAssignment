@@ -39,9 +39,6 @@ def _dequeu(lst: list) -> Any:
 def _elevator_has_room(elevator: Elevator) -> bool:
     """Returns true if the <elevator> can take more people.
     """
-    #Dak - we could also use this:
-    #return not elevator._fullness == 1.0
-    #thus, if it is full (1.0), then the elevator has no room (returns false)
     return len(elevator.passengers) < elevator.max_capacity
 
 
