@@ -203,6 +203,7 @@ def test_short_sighted_moving_algorithm() -> None:
     assert results['min_time'] == 3
     assert results['avg_time'] == 4
 
+
 def test_short_sighted_unit_test():
     config = {
         'num_floors': 4,
@@ -210,7 +211,7 @@ def test_short_sighted_unit_test():
         'elevator_capacity': 2,
         # This is likely not used.
         'num_people_per_round': 3,
-        'arrival_generator': FileArrivals(5, 'sample_arrivals.csv'),
+        'arrival_generator': FileArrivals(4, 'short_sighted_arivals.csv'),
         'moving_algorithm': ShortSighted(),
         'visualize': False
     }
@@ -227,6 +228,7 @@ def test_short_sighted_unit_test():
 
     assert test_results == results
 
+
 def test_pushy_passenger():
     config = {
         'num_floors': 3,
@@ -234,7 +236,7 @@ def test_pushy_passenger():
         'elevator_capacity': 2,
         # This is likely not used.
         'num_people_per_round': 3,
-        'arrival_generator': FileArrivals(5, 'sample_arrivals.csv'),
+        'arrival_generator': FileArrivals(3, 'pushy_passenger_arrivals.csv'),
         'moving_algorithm': ShortSighted(),
         'visualize': False
     }
@@ -250,6 +252,7 @@ def test_pushy_passenger():
                     'avg_time': 3}
 
     assert results == test_results
+
 
 if __name__ == '__main__':
     import pytest

@@ -165,7 +165,6 @@ class FileArrivals(ArrivalGenerator):
                         person = Person(int(line[i]), int(line[i+1]))
                         self.arrivals[round].append(person)
 
-
     def generate(self, round_num: int) -> Dict[int, List[Person]]:
         """Return the new arrivals for the simulation at the given round.
 
@@ -183,7 +182,6 @@ class FileArrivals(ArrivalGenerator):
                 by_floor[person.start].append(person)
 
         return by_floor
-
 
 
 ###############################################################################
