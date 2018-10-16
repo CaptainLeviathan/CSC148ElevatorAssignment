@@ -91,15 +91,6 @@ class RandomArrivals(ArrivalGenerator):
     max_floor: int
     num_people: Optional[int]
 
-    def __init__(self, max_floor: int, num_people: Optional[int]) -> None:
-        """Initialize a new ArrivalGenerator.
-
-        Preconditions:
-            max_floor >= 2
-            num_people is None or num_people >= 0
-        """
-        ArrivalGenerator.__init__(self, max_floor, num_people)
-
     def generate(self, round_num: int) -> Dict[int, List[Person]]:  #TODO: look into using sample for this
         """Return the new arrivals for the simulation at the given round.
 
@@ -123,6 +114,7 @@ class RandomArrivals(ArrivalGenerator):
             by_floor[start_floor].append(Person(start_floor, target_floor))
 
         return by_floor
+
 
 class FileArrivals(ArrivalGenerator):
     """Generate arrivals from a CSV file.
@@ -265,10 +257,6 @@ class RandomAlgorithm(MovingAlgorithm):
                 directions.append(Direction(random.randint(-1, 1)))
 
         return directions
-
-
-
-
 
 
 class PushyPassenger(MovingAlgorithm):
