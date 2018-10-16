@@ -166,14 +166,11 @@ class FileArrivals(ArrivalGenerator):
                 # to one line of the original file.
                 # You'll need to convert the strings to ints and then process
                 # and store them.
-                round = line[0]
+                round = line.pop(0)
                 self.arrivals[round] = []
-                data = line[4:].split(', ')#TODO this line has error list has no attribut slpit
-                for i in range(len(data)):
+                for i in range(len(line)):
                     if (i == 0 or i % 2 == 0):
-                        temp = data[i]
-                    else:
-                        person = Person(temp, data[i])
+                        person = Person(int(line[i]), int(line[i+1]))
                         self.arrivals[round].append(person)
 
 
@@ -185,16 +182,15 @@ class FileArrivals(ArrivalGenerator):
 
         You can choose whether to include floors where no people arrived.
         """
-
-        #TODO - DECIDE IF WILL INCLUDE FLOORS WHERE NO PERSON ARRIVED (NOT CURRENTLY THE CASE) (Lev Dont need to include empty floors)
-
-        round_data = self.arrivals[round_num]
         by_floor = dict()
 
-        for person in round_data:
-            by_floor.setdefault(person.start, []) # this makes the floor if the floor has not yet been made
-            by_floor[person.start].append(person)
+        if round_num in self.arrivals:
+            round_data = self.arrivals[round_num]
+            for person in round_data:
+                by_floor.setdefault(person.start, []) # this makes the floor if the floor has not yet been made
+                by_floor[person.start].append(person)
 
+        return by_floor
 
 
 
