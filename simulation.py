@@ -156,8 +156,11 @@ class Simulation:
         arrivals = self.arrival_generator.generate(round_num)
 
         # Takes the people in arrivals and adds them floor by floor to waiting.
-        for floor in arrivals.keys():
-            self.waiting[floor].extend(arrivals[floor])
+        for floor in arrivals:
+            if floor in self.waiting:
+                self.waiting[floor].extend(arrivals[floor])
+            else:
+                self.waiting[floor] = arrivals[floor]
             self._total_people += len(arrivals[floor])
 
         self.visualizer.show_arrivals(arrivals)
