@@ -47,7 +47,7 @@ class Elevator(ElevatorSprite):
     max_capacity: int
 
     def __init__(self, max_capacity: int) -> None:
-        """Creates a new Elevator
+        """Creates a new Elevator with max_capacity of <max_capacity>.
 
         Precondition:
         -max_capacity > 0
@@ -88,9 +88,10 @@ class Person(PersonSprite):
     wait_time: the number of rounds this person has been waiting
 
     === Representation invariants ===
-    start >= 1
-    target >= 1
-    wait_time >= 0
+    - 1 <= start <= num_floors
+    - 1 <= target <= num_floors#TODO same as above
+    - start != target
+    - wait_time >= 0
     """
     start: int
     target: int
@@ -101,8 +102,9 @@ class Person(PersonSprite):
          and there <target> floor.
 
         Pre-conditions:
-        - start >= 1
-        - target >= 1
+        - 1 <= start <= num_floors
+        - 1 <= target <= num_floors
+        - start != target
         """
         self.start = start
         self.target = target
@@ -138,9 +140,12 @@ class Person(PersonSprite):
         else:
             return 4
 
+
 if __name__ == '__main__':
     import python_ta
     python_ta.check_all(config={
         'extra-imports': ['sprites'],
-        'max-nested-blocks': 4
+        'max-nested-blocks': 4,
+        'max-attributes': 12,
+        'disable': ['R0201']
     })

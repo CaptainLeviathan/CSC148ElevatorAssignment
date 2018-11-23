@@ -28,9 +28,8 @@ from visualizer import Visualizer
 # Helpers
 ################################################################################
 
-
-def _dequeu(lst: Any) -> Any:
-    """Removes and returns the first item in a list
+def _dequeue(lst: list) -> Any:
+    """Removes and returns the first item in a list.
     """
     item = lst[0]
     lst.remove(item)
@@ -38,18 +37,19 @@ def _dequeu(lst: Any) -> Any:
 
 
 def _elevator_has_room(elevator: Elevator) -> bool:
-    """Returns true if the elevator can take more people.
+    """Returns true if the <elevator> can take more people.
     """
     return len(elevator.passengers) < elevator.max_capacity
 
 
 def _average(lst: List[int]) -> Optional[float]:
     """Takes the average of a list of ints
-    if the list is empty it will return None
+    if the list is empty it will return None.
     """
 
     if len(lst) == 0:
         return None
+
     total = 0
     for amount in lst:
         total += amount
@@ -68,15 +68,16 @@ class Simulation:
     visualizer: the Pygame visualizer used to visualize this simulation
     waiting: a dictionary of people waiting for an elevator
              (keys are floor numbers, values are the list of waiting people)
+    === Representation Invariants ===
+    - elevators > 0
+    - num_floors > 0
     """
-    # TODO Add representaion invariants
 
     # === Private Attributes ===
     # _total_people: The total number of people who have
     #   arrived during the simulation.
     # _completed_people_times: A list of times for the
     #   people who completed their journey.
-    # _number_of_iterations: The number of rounds in the simulation.
 
     arrival_generator: algorithms.ArrivalGenerator
     elevators: List[Elevator]
@@ -87,15 +88,10 @@ class Simulation:
 
     _total_people: int
     _completed_people_times: List[int]
-    _number_of_iterations: int
 
     def __init__(self,
                  config: Dict[str, Any]) -> None:
         """Initialize a new simulation using the given configuration."""
-
-        # Initialize the visualizer.
-        # Note that this should be called *after* the other attributes
-        # have been initialized.
 
         self.arrival_generator = config['arrival_generator']
 
@@ -117,7 +113,6 @@ class Simulation:
 
         self._total_people = 0
         self._completed_people_times = []
-        self._number_of_iterations = 0
 
     ############################################################################
     # Handle rounds of simulation.
@@ -133,15 +128,14 @@ class Simulation:
         Note: each run of the simulation starts from the same initial state
         (no people, all elevators are empty and start at floor 1).
         """
-        self._number_of_iterations = num_rounds
         for i in range(num_rounds):
             self.visualizer.render_header(i)
 
+            # Stage 0: update people state (Lev added this on) this makes the assumption that peoples first round of existence is round 0.
+            self._update_people() #TODO find out if this should come befor or after new arivals
+
             # Stage 1: generate new arrivals
             self._generate_arrivals(i)
-
-            #Stage 1.5: update people state (Lev added this on)
-            self._update_people() #TODO find out if this should come befor or after new arivals
 
             # Stage 2: leave elevators
             self._handle_leaving()
@@ -155,21 +149,36 @@ class Simulation:
             # Pause for 1 second
             self.visualizer.wait(1)
 
-        return self._calculate_stats()
+        return self._calculate_stats(num_rounds)
 
     def _generate_arrivals(self, round_num: int) -> None:
         """Generate and visualize new arrivals."""
         arrivals = self.arrival_generator.generate(round_num)
 
         # Takes the people in arrivals and adds them floor by floor to waiting.
-        for floor in arrivals.keys():
-            self.waiting[floor].extend(arrivals[floor])
+        for floor in arrivals:
+            if floor in self.waiting:
+                self.waiting[floor].extend(arrivals[floor])
+            else:
+                self.waiting[floor] = arrivals[floor]
             self._total_people += len(arrivals[floor])
 
         self.visualizer.show_arrivals(arrivals)
 
+    def _handle_leaving(self) -> None:
+        """Handle people leaving elevators."""
+        for elevator in self.elevators:
+            floor = elevator.floor
+            passengers = elevator.passengers
+            for passenger in passengers:
+                if passenger.target == floor:
+                    passengers.remove(passenger)
+                    self.visualizer.show_disembarking(passenger, elevator)
+                    # This is for stats
+                    self._completed_people_times.append(passenger.wait_time)
+
     def _update_people(self) -> None:
-        """lets people know round has passed"""
+        """Calls round_passed on all people in the simulation."""
 
         # Updates all the people waiting
         for floor in self.waiting:
@@ -181,17 +190,6 @@ class Simulation:
             for person in elevator.passengers:
                 person.round_passed()
 
-    def _handle_leaving(self) -> None:
-        """Handle people leaving elevators."""
-        for elevator in self.elevators:
-            floor = elevator.floor
-            passengers = elevator.passengers
-            for passenger in passengers:
-                if passenger.target == floor:
-                    passengers.remove(passenger)
-                    self._completed_people_times.append(passenger.wait_time)
-                    self.visualizer.show_disembarking(passenger, elevator)
-
     def _handle_boarding(self) -> None:
         """Handle boarding of people and visualize."""
         # Looks at each elevator and the floor its on
@@ -199,7 +197,7 @@ class Simulation:
         for elevator in self.elevators:
             floor = elevator.floor
             while _elevator_has_room(elevator) and len(self.waiting[floor]) > 0:
-                boarder = _dequeu(self.waiting[floor])
+                boarder = _dequeue(self.waiting[floor])
                 elevator.passengers.append(boarder)
                 self.visualizer.show_boarding(boarder, elevator)
 
@@ -219,16 +217,28 @@ class Simulation:
     ############################################################################
     # Statistics calculations
     ############################################################################
-    def _calculate_stats(self) -> Dict[str, int]:
+    def _calculate_stats(self, number_of_rounds: int) -> Dict[str, int]:
         """Report the statistics for the current run of this simulation.
-        """
+        Uses <number_of_rounds> for this reporting.
+         """
+        comp_times = self._completed_people_times
+
+        if not comp_times:
+            min_time = -1
+            max_time = -1
+            avg_time = -1
+        else:
+            min_time = min(comp_times)
+            max_time = max(comp_times)
+            avg_time = int(_average(comp_times))
+
         return {
-            'num_iterations': self._number_of_iterations,
+            'num_iterations': number_of_rounds,
             'total_people': self._total_people,
             'people_completed': len(self._completed_people_times),
-            'max_time': max(self._completed_people_times),
-            'min_time': min(self._completed_people_times),
-            'avg_time': _average(self._completed_people_times)
+            'max_time': max_time,
+            'min_time': min_time,
+            'avg_time': avg_time
         }
 
 
@@ -258,5 +268,7 @@ if __name__ == '__main__':
     import python_ta
     python_ta.check_all(config={
         'extra-imports': ['entities', 'visualizer', 'algorithms', 'time'],
-        'max-nested-blocks': 4
+        'max-nested-blocks': 4,
+        'max-attributes': 12,
+        'disable': ['R0201']
     })

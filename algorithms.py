@@ -91,15 +91,6 @@ class RandomArrivals(ArrivalGenerator):
     max_floor: int
     num_people: Optional[int]
 
-    def __init__(self, max_floor: int, num_people: Optional[int]) -> None:
-        """Initialize a new ArrivalGenerator.
-
-        Preconditions:
-            max_floor >= 2
-            num_people is None or num_people >= 0
-        """
-        ArrivalGenerator.__init__(self, max_floor, num_people)
-
     def generate(self, round_num: int) -> Dict[int, List[Person]]:  #TODO: look into using sample for this
         """Return the new arrivals for the simulation at the given round.
 
@@ -115,7 +106,7 @@ class RandomArrivals(ArrivalGenerator):
 
             same_floor = True
             while same_floor:
-                target_floor = random.randint(0, self.max_floor)
+                target_floor = random.randint(1, self.max_floor)
                 if not start_floor == target_floor:
                     same_floor = False
 
@@ -123,6 +114,7 @@ class RandomArrivals(ArrivalGenerator):
             by_floor[start_floor].append(Person(start_floor, target_floor))
 
         return by_floor
+
 
 class FileArrivals(ArrivalGenerator):
     """Generate arrivals from a CSV file.
@@ -140,7 +132,7 @@ class FileArrivals(ArrivalGenerator):
     max_floor >= 2
     num_people is None or num_people >= 0
     """
-    max_floor: int
+    max_floor: int #TODO you dont need these type anotations. They only need to be in the super class.
     num_people: Optional[int]
     arrivals: Dict[int, List[Person]]
 
@@ -166,16 +158,28 @@ class FileArrivals(ArrivalGenerator):
                 # to one line of the original file.
                 # You'll need to convert the strings to ints and then process
                 # and store them.
-                round = line[0]
-                self.arrivals[round] = []
-                data = line[4:].split(', ')
-                for i in range(len(data)):
-                    if (i == 0 or i % 2 == 0):
-                        temp = data[i]
-                    else:
-                        person = Person(temp, data[i])
-                        self.arrivals[round].append(person)
+                round_num = int(line.pop(0))
+                self.arrivals[round_num] = []
+                for i in range(len(line)):
+                    if i % 2 == 0: #for every other item in line, beginning at 0
+                        person = Person(int(line[i]), int(line[i+1]))
+                        self.arrivals[round_num].append(person)
 
+        #TODO DELETE THESE ASSERT STATEMENTS
+        """ FOR SAMPLE_ARRIVALS.CSV TESTING
+        assert len(self.arrivals[1]) == 2
+        assert self.arrivals[1][0].start == 1
+        assert self.arrivals[1][0].target == 4
+        assert self.arrivals[1][1].start == 5
+        assert self.arrivals[1][1].target == 3
+        assert 2 not in self.arrivals
+        assert len(self.arrivals[3]) == 1
+        assert self.arrivals[3][0].start == 1
+        assert self.arrivals[3][0].target == 2
+        assert 4 not in self.arrivals
+        assert len(self.arrivals[5]) == 1
+        assert self.arrivals[5][0].start == 4
+        assert self.arrivals[5][0].target == 2"""
 
     def generate(self, round_num: int) -> Dict[int, List[Person]]:
         """Return the new arrivals for the simulation at the given round.
@@ -185,17 +189,25 @@ class FileArrivals(ArrivalGenerator):
 
         You can choose whether to include floors where no people arrived.
         """
-
-        #TODO - DECIDE IF WILL INCLUDE FLOORS WHERE NO PERSON ARRIVED (NOT CURRENTLY THE CASE) (Lev Dont need to include empty floors)
-
-        round_data = self.arrivals[round_num]
+        #TODO DELETE ALL ASSERTS IN THIS METH0OD
         by_floor = dict()
 
-        for person in round_data:
-            by_floor.setdefault(person.start, []) # this makes the floor if the floor has not yet been made
-            by_floor[person.start].append(person)
+        if round_num in self.arrivals:
+            """assert isinstance(self.arrivals[round_num], list)
+            assert self.arrivals[round_num] != []"""
+            round_data = self.arrivals[round_num]
+            for person in round_data:
+                by_floor.setdefault(person.start, []) # this makes the floor if the floor has not yet been made
+                by_floor[person.start].append(person)
 
+        """if round_num == 1:
+            assert len(by_floor) == 2
+        elif round_num == 3 or round_num == 5:
+            assert len(by_floor) == 1
+        else:
+            assert len(by_floor) == 0"""
 
+        return by_floor
 
 
 ###############################################################################
@@ -255,8 +267,8 @@ class RandomAlgorithm(MovingAlgorithm):
 
         directions = []
         for elevator in elevators:
-            # Direction(int) creates a direction of type Direction.UP, Down, or
-            # Stay.
+            # Direction(int) creates a <Direction> of type Direction.UP, Down,
+            # or Stay.
             if elevator.floor >= max_floor:
                 directions.append(Direction(random.randint(-1, 0)))
             elif elevator.floor <= 1:
@@ -265,10 +277,6 @@ class RandomAlgorithm(MovingAlgorithm):
                 directions.append(Direction(random.randint(-1, 1)))
 
         return directions
-
-
-
-
 
 
 class PushyPassenger(MovingAlgorithm):
@@ -280,7 +288,38 @@ class PushyPassenger(MovingAlgorithm):
     If the elevator isn't empty, it moves towards the target floor of the
     *first* passenger who boarded the elevator.
     """
-    pass #TODO implement this
+
+    def move_elevators(self,
+                       elevators: List[Elevator],
+                       waiting: Dict[int, List[Person]],
+                       max_floor: int) -> List[Direction]:
+        """Return a list of directions for each elevator to move to.
+
+        As input, this method receives the list of elevators in the simulation,
+        a dictionary mapping floor number to a list of people waiting on
+        that floor, and the maximum floor number in the simulation.
+
+        Note that each returned direction should be valid:
+            - An elevator at Floor 1 cannot move down.
+            - An elevator at the top floor cannot move up.
+        """
+        directions = []
+
+        for elevator in elevators:
+
+            if elevator.passengers == []:
+                if elevator.floor > 1:
+                    directions.append(Direction.DOWN)
+                else:
+                    directions.append(Direction.STAY)
+            else:
+                passenger = elevator.passengers[0]
+                if passenger.target > elevator.floor:
+                    directions.append(Direction.UP)
+                else: #passenger.target < elevator.floor
+                    directions.append(Direction.DOWN)
+
+        return directions
 
 
 class ShortSighted(MovingAlgorithm):
@@ -294,7 +333,51 @@ class ShortSighted(MovingAlgorithm):
 
     In this case, the order in which people boarded does *not* matter.
     """
-    pass #TODO implement this
+    def move_elevators(self,
+                       elevators: List[Elevator],
+                       waiting: Dict[int, List[Person]],
+                       max_floor: int) -> List[Direction]:
+        """Return a list of directions for each elevator to move to.
+
+        As input, this method receives the list of elevators in the simulation,
+        a dictionary mapping floor number to a list of people waiting on
+        that floor, and the maximum floor number in the simulation.
+
+        Note that each returned direction should be valid:
+            - An elevator at Floor 1 cannot move down.
+            - An elevator at the top floor cannot move up.
+        """
+        directions = []
+
+        for elevator in elevators:
+
+            if len(elevator.passengers) > 0:
+                # Passengers are on the elevator
+                # Go towards the closest target floor of a passenger
+                closest_distance = max_floor + 1
+                elevator_target = max_floor + 1
+
+                for passenger in elevator.passengers:
+                    distance = abs(elevator.floor - passenger.target)
+                    if distance < closest_distance:
+                        closest_distance = distance
+                        elevator_target = passenger.target
+
+                if elevator_target > elevator.floor:
+                    directions.append(Direction.UP)
+                else:
+                    directions.append(Direction.DOWN)
+
+            #elif PEOPLE ARE WAITING FOR AN ELEVATOR
+                # TODO - FIGURE OUT HOW TO KNOW THAT THERE ARE PEOPLE WAITING
+                # This is for when the elevator is empty, but people are waiting for an elevator
+                # It should move to the closest floor where someone is waiting
+
+            else:
+                # No passengers on board, no one waiting for an elevator
+                directions.append(Direction.STAY)
+
+        return directions
 
 
 if __name__ == '__main__':
@@ -304,5 +387,6 @@ if __name__ == '__main__':
         'allowed-io': ['__init__'],
         'extra-imports': ['entities', 'random', 'csv', 'enum'],
         'max-nested-blocks': 4,
-        'disable': ['R0201']
+        'disable': ['R0201'],
+        'max-attributes': 12,
     })

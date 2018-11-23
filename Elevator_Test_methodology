@@ -1,0 +1,397 @@
+Already coverd testing
+test_random_arrival_generator_zero
+    *Check the the floor is in the correct range.
+    *Check that the right number of people were generated.
+      -i.e. the number per_round.
+    *Checks that people are being sent to the right floors
+      -i.e. those floors exist
+test_file_arrival_generator
+    *Test to see that round 0 has no arivals
+    *Test to see that round one has correct arivals
+    *Test to see that round 5 and only one person arives on fith floor
+
+test_random_moving_algorithm
+    This one is a bit more wishy washy.
+    * tests that numrounds and total people comes back ok.
+    * Checks that the range of people completed is good.
+    * Check that if no one finished that aveage time,min time and max time are all -1
+    * Checks that all the reporting makes some sense
+
+TODO add these for pushy passenger and short sighted.
+TODO use manual test to make more general test of the algorithems.
+
+================ Test sequence for pushy passenger test 1. =====================
+number_floors: 3
+number_elevator: 2
+elevator_capasity: 2
+number_people_per_round: 3
+number rounds: 10
+=== Round 0 ===
+make person? (y/n)y
+person 0 start floor: 1
+person 0 target floor: 2
+make person? (y/n)y
+person 1 start floor: 1
+person 1 target floor: 3
+make person? (y/n)y
+person 2 start floor: 1
+person 2 target floor: 3
+waiting passengers
+3: 0
+2: 0
+1: 0
+Current floor is 1
+Target floors:
+2
+3
+Direction for elevator 0: up
+Current floor is 1
+Target floors:
+3
+Direction for elevator 1: up
+=== Round 1 ===
+make person? (y/n)y
+person 0 start floor: 3
+person 0 target floor: 1
+make person? (y/n)y
+person 1 start floor: 1
+person 1 target floor: 3
+make person? (y/n)n
+waiting passengers
+3: 1
+2: 0
+1: 1
+Current floor is 2
+Target floors:
+3
+Direction for elevator 0: up
+Current floor is 2
+Target floors:
+3
+Direction for elevator 1: up
+=== Round 2 ===
+make person? (y/n)y
+person 0 start floor: 2
+person 0 target floor: 3
+make person? (y/n)y
+person 1 start floor: 2
+person 1 target floor: 1
+make person? (y/n)y
+person 2 start floor: 2
+person 2 target floor: 3
+waiting passengers
+3: 0
+2: 3
+1: 1
+Current floor is 3
+Target floors:
+1
+Direction for elevator 0: down
+Current floor is 3
+Target floors:
+Direction for elevator 1: down
+=== Round 3 ===
+make person? (y/n)y
+person 0 start floor: 3
+person 0 target floor: 1
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+3: 1
+2: 0
+1: 1
+Current floor is 2
+Target floors:
+1
+3
+Direction for elevator 0: down
+Current floor is 2
+Target floors:
+1
+3
+Direction for elevator 1: down
+=== Round 4 ===
+make person? (y/n)y
+person 0 start floor: 2
+person 0 target floor: 1
+make person? (y/n)y
+person 1 start floor: 2
+person 1 target floor: 3
+make person? (y/n)n
+waiting passengers
+3: 1
+2: 2
+1: 0
+Current floor is 1
+Target floors:
+3
+3
+Direction for elevator 0: up
+Current floor is 1
+Target floors:
+3
+Direction for elevator 1: up
+=== Round 5 ===
+make person? (y/n)y
+person 0 start floor: 1
+person 0 target floor: 2
+make person? (y/n)y
+person 1 start floor: 3
+person 1 target floor: 2
+make person? (y/n)n
+waiting passengers
+3: 2
+2: 1
+1: 1
+Current floor is 2
+Target floors:
+3
+3
+Direction for elevator 0: up
+Current floor is 2
+Target floors:
+3
+1
+Direction for elevator 1: up
+=== Round 6 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+3: 0
+2: 1
+1: 1
+Current floor is 3
+Target floors:
+3
+1
+Direction for elevator 0: stay
+Current floor is 3
+Target floors:
+1
+2
+Direction for elevator 1: down
+=== Round 7 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+3: 0
+2: 0
+1: 1
+Current floor is 3
+Target floors:
+1
+Direction for elevator 0: down
+Current floor is 2
+Target floors:
+1
+3
+Direction for elevator 1: down
+=== Round 8 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+3: 0
+2: 0
+1: 0
+Current floor is 2
+Target floors:
+1
+Direction for elevator 0: down
+Current floor is 1
+Target floors:
+3
+2
+Direction for elevator 1: up
+=== Round 9 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+3: 0
+2: 0
+1: 0
+Current floor is 1
+Target floors:
+Direction for elevator 0: stay
+Current floor is 2
+Target floors:
+3
+Direction for elevator 1: up
+=== config ===
+{'num_floors': 3, 'num_elevators': 2, 'elevator_capacity': 2, 'num_people_per_round': 3, 'arrival_generator': <__main__.ManualArrivalGenerator object at 0x7f08a6376ac8>, 'moving_algorithm': <__main__.ManualMovingAlgorithm object at 0x7f08a6376b00>, 'visualize': True}
+=== Copy to CSV if you want ===
+0, 1, 2, 1, 3, 1, 3
+1, 3, 1, 1, 3
+2, 2, 3, 2, 1, 2, 3
+3, 3, 1
+4, 2, 1, 2, 3
+5, 1, 2, 3, 2
+
+{'num_iterations': 10, 'total_people': 13, 'people_completed': 12, 'max_time': 6, 'min_time': 1, 'avg_time': 3.3333333333333335}
+
+
+=========== Test sequence for short sighted 1 ====================================
+
+number_floors: 4
+number_elevator: 2
+elevator_capasity: 2
+number_people_per_round: 3
+number rounds: 8
+=== Round 0 ===
+make person? (y/n)y
+person 0 start floor: 2
+person 0 target floor: 3
+make person? (y/n)y
+person 1 start floor: 3
+person 1 target floor: 2
+make person? (y/n)n
+waiting passengers
+4: 0
+3: 1
+2: 1
+1: 0
+Current floor is 1
+Target floors:
+Direction for elevator 0: up
+Current floor is 1
+Target floors:
+Direction for elevator 1: up
+=== Round 1 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+4: 0
+3: 1
+2: 0
+1: 0
+Current floor is 2
+Target floors:
+3
+Direction for elevator 0: up
+Current floor is 2
+Target floors:
+Direction for elevator 1: up
+=== Round 2 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+4: 0
+3: 0
+2: 0
+1: 0
+Current floor is 3
+Target floors:
+2
+Direction for elevator 0: down
+Current floor is 3
+Target floors:
+Direction for elevator 1: stay
+=== Round 3 ===
+make person? (y/n)y
+person 0 start floor: 1
+person 0 target floor: 2
+make person? (y/n)y
+person 1 start floor: 4
+person 1 target floor: 1
+make person? (y/n)n
+waiting passengers
+4: 1
+3: 0
+2: 0
+1: 1
+Current floor is 2
+Target floors:
+Direction for elevator 0: down
+Current floor is 3
+Target floors:
+Direction for elevator 1: up
+=== Round 4 ===
+make person? (y/n)y
+person 0 start floor: 3
+person 0 target floor: 4
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+4: 0
+3: 1
+2: 0
+1: 0
+Current floor is 1
+Target floors:
+2
+Direction for elevator 0: up
+Current floor is 4
+Target floors:
+1
+Direction for elevator 1: down
+=== Round 5 ===
+make person? (y/n)y
+person 0 start floor: 3
+person 0 target floor: 2
+make person? (y/n)y
+person 1 start floor: 2
+person 1 target floor: 4
+make person? (y/n)y
+person 2 start floor: 1
+person 2 target floor: 4
+waiting passengers
+4: 0
+3: 1
+2: 0
+1: 1
+Current floor is 2
+Target floors:
+4
+Direction for elevator 0: up
+Current floor is 3
+Target floors:
+1
+4
+Direction for elevator 1: up
+=== Round 6 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+4: 0
+3: 0
+2: 0
+1: 1
+Current floor is 3
+Target floors:
+4
+2
+Direction for elevator 0: up
+Current floor is 4
+Target floors:
+1
+Direction for elevator 1: down
+=== Round 7 ===
+make person? (y/n)n
+make person? (y/n)n
+make person? (y/n)n
+waiting passengers
+4: 0
+3: 0
+2: 0
+1: 1
+Current floor is 4
+Target floors:
+2
+Direction for elevator 0: down
+Current floor is 3
+Target floors:
+1
+Direction for elevator 1: down
+=== Copy to CSV if you want ===
+0, 2, 3, 3, 2
+3, 1, 2, 4, 1
+4, 3, 4
+5, 3, 2, 2, 4, 1, 4
+
+{'num_iterations': 8, 'total_people': 8, 'people_completed': 5, 'max_time': 3, 'min_time': 2, 'avg_time': 2.2}
